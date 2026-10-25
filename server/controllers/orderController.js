@@ -74,11 +74,18 @@ export async function cancelOrder(req, res) {
     { new: true }
   );
   if (!order) return res.status(404).json({ message: "Order cannot be cancelled" });
-  if (mongoose.connection.readyState === 1) {
-    const restockable = order.items.filter((item) => mongoose.isValidObjectId(item.product));
-    if (restockable.length) await Product.bulkWrite(restockable.map((item) => ({ updateOne: { filter: { _id: item.product }, update: { $inc: { stock: item.quantity } } } })));
-  }
+  await restockOrderItems(order);
   res.json(order);
+}
+
+async function restockOrderItems(order) {
+  if (mongoose.connection.readyState !== 1) return;
+  const restockable = order.items.filter((item) => mongoose.isValidObjectId(item.product));
+  if (restockable.length) {
+    await Product.bulkWrite(restockable.map((item) => ({
+      updateOne: { filter: { _id: item.product }, update: { $inc: { stock: item.quantity } } }
+    })));
+  }
 }
 
 export async function listAllOrders(_req, res) {
@@ -89,7 +96,17 @@ export async function listAllOrders(_req, res) {
 export async function updateOrderStatus(req, res) {
   const allowedStatuses = ["pending", "paid", "shipped", "delivered", "cancelled"];
   if (!allowedStatuses.includes(req.body?.status)) return res.status(400).json({ message: "Invalid order status" });
-  const order = await Order.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true }).populate("user", "name email");
+  const order = await Order.findById(req.params.id);
   if (!order) return res.status(404).json({ message: "Order not found" });
+  if (order.status === "cancelled" && req.body.status !== "cancelled") return res.status(409).json({ message: "Cancelled orders cannot be reopened" });
+  if (order.status !== "cancelled" && req.body.status === "cancelled") {
+    order.status = "cancelled";
+    await order.save();
+    await restockOrderItems(order);
+  } else if (order.status !== req.body.status) {
+    order.status = req.body.status;
+    await order.save();
+  }
+  await order.populate("user", "name email");
   res.json(order);
 }
