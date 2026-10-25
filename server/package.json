@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "scripts": { "dev": "node --watch server.js", "start": "node server.js", "seed:products": "node scripts/seedProducts.js" },
+  "scripts": { "dev": "node --watch server.js", "start": "node server.js", "seed:products": "node scripts/seedProducts.js", "make:admin": "node scripts/promoteAdmin.js" },
   "dependencies": {
     "bcryptjs": "latest",
     "cors": "latest",

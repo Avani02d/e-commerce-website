@@ -36,7 +36,15 @@ After MongoDB is configured:
 npm --prefix server run seed:products
 ```
 
-## 5. Start and verify
+## 5. Grant admin access
+
+Register a normal account first, then promote it from the project root:
+
+```bash
+npm --prefix server run make:admin -- user@example.com
+```
+
+## 6. Start and verify
 
 ```bash
 npm run dev
