@@ -18,7 +18,7 @@ export const cartApi = {
   clear: (token) => request("/cart", { method: "DELETE", headers: { Authorization: `Bearer ${token}` } })
 };
 export const askAI = (message) => request("/ai", { method: "POST", body: JSON.stringify({ message }) });
-export const productsApi = { list: () => request("/products"), get: (id) => request(`/products/${id}`), create: (token, payload) => request("/products", { method: "POST", headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify(payload) }), remove: (token, id) => request(`/products/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } }) };
+export const productsApi = { list: () => request("/products"), get: (id) => request(`/products/${id}`), create: (token, payload) => request("/products", { method: "POST", headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify(payload) }), update: (token, id, payload) => request(`/products/${id}`, { method: "PUT", headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify(payload) }), remove: (token, id) => request(`/products/${id}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } }) };
 export const orderApi = {
   list: (token) => request("/orders", { headers: { Authorization: `Bearer ${token}` } }),
   create: (token, payload) => request("/orders", { method: "POST", headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify(payload) }),
