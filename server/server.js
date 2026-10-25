@@ -20,7 +20,7 @@ const port = process.env.PORT || 5000;
 
 app.use(helmet());
 app.use(cors({ origin: process.env.CLIENT_URL || "http://localhost:5173" }));
-app.use(express.json());
+app.use(express.json({ limit: "1mb" }));
 app.use("/api", rateLimit({ windowMs: 15 * 60 * 1000, limit: 300, standardHeaders: "draft-8", legacyHeaders: false }));
 
 app.use("/api/auth", authRoutes);
@@ -46,3 +46,12 @@ if (process.env.NODE_ENV === "production") {
 app.use(notFound);
 app.use(errorHandler);
 connectDB().finally(() => app.listen(port, () => console.log(`E-commerce API running on http://localhost:${port}`)));
+
+async function shutdown(signal) {
+  console.log(`${signal} received; closing database connection`);
+  await mongoose.disconnect();
+  process.exit(0);
+}
+
+process.once("SIGINT", () => shutdown("SIGINT"));
+process.once("SIGTERM", () => shutdown("SIGTERM"));
