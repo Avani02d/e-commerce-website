@@ -1,0 +1,19 @@
+{
+  "name": "ecommerce-server",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": { "dev": "node --watch server.js", "start": "node server.js", "seed:products": "node scripts/seedProducts.js" },
+  "dependencies": {
+    "bcryptjs": "latest",
+    "cors": "latest",
+    "dotenv": "latest",
+    "express": "latest",
+    "express-rate-limit": "latest",
+    "helmet": "latest",
+    "jsonwebtoken": "latest",
+    "mongoose": "latest"
+    ,"openai": "latest"
+    ,"razorpay": "latest"
+  }
+}

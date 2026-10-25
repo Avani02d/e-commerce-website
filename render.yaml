@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: shopwise
+    runtime: node
+    plan: free
+    buildCommand: npm install --prefix client && npm run build --prefix client && npm install --omit=dev --prefix server
+    startCommand: node server/server.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: CLIENT_URL
+        sync: false
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
