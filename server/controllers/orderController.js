@@ -1,11 +1,31 @@
+import mongoose from "mongoose";
 import Order from "../models/Order.js";
+import Product from "../models/Product.js";
 
 export async function createOrder(req, res) {
   const { items, shippingAddress } = req.body;
   if (!Array.isArray(items) || !items.length) return res.status(400).json({ message: "At least one item is required" });
   if (!shippingAddress?.name || !shippingAddress?.line1 || !shippingAddress?.city || !shippingAddress?.postalCode) return res.status(400).json({ message: "Complete shipping details are required" });
 
-  const normalizedItems = items.map((item) => ({ product: item.product, name: item.name, quantity: Math.max(1, Number(item.quantity) || 1), price: Math.max(0, Number(item.price) || 0) }));
+  let normalizedItems;
+  if (mongoose.connection.readyState === 1) {
+    const productIds = items.map((item) => item.product);
+    if (productIds.some((id) => !mongoose.isValidObjectId(id))) return res.status(400).json({ message: "Every order item must reference a valid product" });
+
+    const products = await Product.find({ _id: { $in: productIds } });
+    const productById = new Map(products.map((product) => [product._id.toString(), product]));
+    normalizedItems = items.map((item) => {
+      const product = productById.get(String(item.product));
+      const quantity = Number(item.quantity);
+      if (!product) return null;
+      if (!Number.isInteger(quantity) || quantity < 1) return null;
+      if (product.stock < quantity) return null;
+      return { product: product._id.toString(), name: product.name, quantity, price: product.price };
+    });
+    if (normalizedItems.some((item) => !item)) return res.status(409).json({ message: "One or more products are unavailable or out of stock" });
+  } else {
+    normalizedItems = items.map((item) => ({ product: item.product, name: item.name, quantity: Math.max(1, Number(item.quantity) || 1), price: Math.max(0, Number(item.price) || 0) }));
+  }
   const total = normalizedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const order = await Order.create({ user: req.user.id, items: normalizedItems, total, shippingAddress });
   res.status(201).json(order);
