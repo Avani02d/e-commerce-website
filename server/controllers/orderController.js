@@ -23,6 +23,31 @@ export async function createOrder(req, res) {
       return { product: product._id.toString(), name: product.name, quantity, price: product.price };
     });
     if (normalizedItems.some((item) => !item)) return res.status(409).json({ message: "One or more products are unavailable or out of stock" });
+
+    const reserved = [];
+    try {
+      for (const item of normalizedItems) {
+        const product = await Product.findOneAndUpdate(
+          { _id: item.product, stock: { $gte: item.quantity } },
+          { $inc: { stock: -item.quantity } },
+          { new: true }
+        );
+        if (!product) throw new Error("Stock changed while placing the order");
+        reserved.push(item);
+      }
+    } catch (error) {
+      if (reserved.length) await Product.bulkWrite(reserved.map((item) => ({ updateOne: { filter: { _id: item.product }, update: { $inc: { stock: item.quantity } } } })));
+      return res.status(409).json({ message: error.message });
+    }
+
+    try {
+      const total = normalizedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const order = await Order.create({ user: req.user.id, items: normalizedItems, total, shippingAddress });
+      return res.status(201).json(order);
+    } catch (error) {
+      await Product.bulkWrite(normalizedItems.map((item) => ({ updateOne: { filter: { _id: item.product }, update: { $inc: { stock: item.quantity } } } })));
+      throw error;
+    }
   } else {
     normalizedItems = items.map((item) => ({ product: item.product, name: item.name, quantity: Math.max(1, Number(item.quantity) || 1), price: Math.max(0, Number(item.price) || 0) }));
   }
