@@ -67,6 +67,20 @@ export async function getOrder(req, res) {
   res.json(order);
 }
 
+export async function cancelOrder(req, res) {
+  const order = await Order.findOneAndUpdate(
+    { _id: req.params.id, user: req.user.id, status: { $in: ["pending", "paid"] } },
+    { status: "cancelled" },
+    { new: true }
+  );
+  if (!order) return res.status(404).json({ message: "Order cannot be cancelled" });
+  if (mongoose.connection.readyState === 1) {
+    const restockable = order.items.filter((item) => mongoose.isValidObjectId(item.product));
+    if (restockable.length) await Product.bulkWrite(restockable.map((item) => ({ updateOne: { filter: { _id: item.product }, update: { $inc: { stock: item.quantity } } } })));
+  }
+  res.json(order);
+}
+
 export async function listAllOrders(_req, res) {
   const orders = await Order.find().populate("user", "name email").sort({ createdAt: -1 });
   res.json(orders);

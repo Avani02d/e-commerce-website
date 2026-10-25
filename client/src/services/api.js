@@ -23,6 +23,7 @@ export const orderApi = {
   list: (token) => request("/orders", { headers: { Authorization: `Bearer ${token}` } }),
   create: (token, payload) => request("/orders", { method: "POST", headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify(payload) }),
   get: (token, id) => request(`/orders/${id}`, { headers: { Authorization: `Bearer ${token}` } }),
+  cancel: (token, id) => request(`/orders/${id}/cancel`, { method: "PATCH", headers: { Authorization: `Bearer ${token}` } }),
   adminList: (token) => request("/orders/admin", { headers: { Authorization: `Bearer ${token}` } }),
   updateStatus: (token, id, status) => request(`/orders/admin/${id}/status`, { method: "PATCH", headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify({ status }) })
 };
