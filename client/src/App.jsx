@@ -28,7 +28,8 @@ function Layout({ children }) {
 function ProductCard({ product }) {
   const { add } = useCart();
   const { toggle, has } = useWishlist();
-  return <article className="product-tile"><Link to={`/products/${product.id}`} className={`product-image ${product.tone || "ocean"}`}><span>{product.category}</span><button className="heart" onClick={(event) => { event.preventDefault(); toggle(product); }} aria-label="Toggle wishlist">{has(product.id) ? "♥" : "♡"}</button><div>{product.name.split(" ").slice(0, 2).join(" ")}</div></Link><div className="product-meta"><div><Link to={`/products/${product.id}`}><h3>{product.name}</h3></Link><p>{product.category}</p></div><div className="product-price"><strong>₹{product.price.toLocaleString("en-IN")}</strong><button onClick={() => add(product)}>Add</button></div></div></article>;
+  const outOfStock = Number.isFinite(product.stock) && product.stock < 1;
+  return <article className="product-tile"><Link to={`/products/${product.id}`} className={`product-image ${product.tone || "ocean"}`}><span>{product.category}</span><button className="heart" onClick={(event) => { event.preventDefault(); toggle(product); }} aria-label="Toggle wishlist">{has(product.id) ? "♥" : "♡"}</button><div>{product.name.split(" ").slice(0, 2).join(" ")}</div></Link><div className="product-meta"><div><Link to={`/products/${product.id}`}><h3>{product.name}</h3></Link><p>{outOfStock ? "Out of stock" : product.category}</p></div><div className="product-price"><strong>₹{product.price.toLocaleString("en-IN")}</strong><button onClick={() => add(product)} disabled={outOfStock}>{outOfStock ? "Sold out" : "Add"}</button></div></div></article>;
 }
 
 function useProducts() { const [items, setItems] = useState(products); const [loading, setLoading] = useState(true); useEffect(() => { productsApi.list().then((result) => setItems(result)).catch(() => {}).finally(() => setLoading(false)); }, []); return { items, loading }; }
