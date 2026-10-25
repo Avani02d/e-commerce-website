@@ -21,7 +21,7 @@ function Layout({ children }) {
   const { count } = useCart();
   const { session } = useAuth();
   const { dark, toggle } = useTheme();
-  return <><header className="topbar"><Link className="brand" to="/">shopwise<span>+</span></Link><nav><Link to="/">Discover</Link><Link to="/products">Products</Link><Link to="/wishlist">Wishlist</Link><Link to="/cart">Cart <b className="cart-badge">{count}</b></Link></nav><button className="theme-toggle" onClick={toggle} aria-label="Toggle theme">{dark ? "☼" : "☾"}</button><Link className="avatar" aria-label="Account" to="/account">{session?.user?.name?.[0]?.toUpperCase() || "A"}</Link></header>{children}<Chatbot/><footer>Thoughtful products, smarter shopping.</footer></>;
+  return <><header className="topbar"><Link className="brand" to="/">shopwise<span>+</span></Link><nav><Link to="/">Discover</Link><Link to="/products">Products</Link><Link to="/wishlist">Wishlist</Link><Link to="/cart">Cart <b className="cart-badge">{count}</b></Link>{session?.user?.role === "admin" && <Link to="/admin/catalog">Admin</Link>}</nav><button className="theme-toggle" onClick={toggle} aria-label="Toggle theme">{dark ? "☼" : "☾"}</button><Link className="avatar" aria-label="Account" to="/account">{session?.user?.name?.[0]?.toUpperCase() || "A"}</Link></header>{children}<Chatbot/><footer>Thoughtful products, smarter shopping.</footer></>;
 }
 
 function ProductCard({ product }) {
