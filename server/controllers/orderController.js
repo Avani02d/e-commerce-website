@@ -66,3 +66,16 @@ export async function getOrder(req, res) {
   if (!order) return res.status(404).json({ message: "Order not found" });
   res.json(order);
 }
+
+export async function listAllOrders(_req, res) {
+  const orders = await Order.find().populate("user", "name email").sort({ createdAt: -1 });
+  res.json(orders);
+}
+
+export async function updateOrderStatus(req, res) {
+  const allowedStatuses = ["pending", "paid", "shipped", "delivered", "cancelled"];
+  if (!allowedStatuses.includes(req.body?.status)) return res.status(400).json({ message: "Invalid order status" });
+  const order = await Order.findByIdAndUpdate(req.params.id, { status: req.body.status }, { new: true }).populate("user", "name email");
+  if (!order) return res.status(404).json({ message: "Order not found" });
+  res.json(order);
+}

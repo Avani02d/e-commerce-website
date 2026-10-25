@@ -22,7 +22,9 @@ export const productsApi = { list: () => request("/products"), get: (id) => requ
 export const orderApi = {
   list: (token) => request("/orders", { headers: { Authorization: `Bearer ${token}` } }),
   create: (token, payload) => request("/orders", { method: "POST", headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify(payload) }),
-  get: (token, id) => request(`/orders/${id}`, { headers: { Authorization: `Bearer ${token}` } })
+  get: (token, id) => request(`/orders/${id}`, { headers: { Authorization: `Bearer ${token}` } }),
+  adminList: (token) => request("/orders/admin", { headers: { Authorization: `Bearer ${token}` } }),
+  updateStatus: (token, id, status) => request(`/orders/admin/${id}/status`, { method: "PATCH", headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify({ status }) })
 };
 export const paymentApi = {
   createOrder: (token, amountInPaise) => request("/payments/create-order", { method: "POST", headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify({ amount: amountInPaise }) }),
