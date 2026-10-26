@@ -96,14 +96,25 @@ export async function listAllOrders(_req, res) {
 export async function updateOrderStatus(req, res) {
   const allowedStatuses = ["pending", "paid", "shipped", "delivered", "cancelled"];
   if (!allowedStatuses.includes(req.body?.status)) return res.status(400).json({ message: "Invalid order status" });
+  if (req.body.status === "cancelled") {
+    const order = await Order.findOneAndUpdate(
+      { _id: req.params.id, status: { $ne: "cancelled" } },
+      { status: "cancelled" },
+      { new: true }
+    );
+    if (!order) {
+      const existing = await Order.findById(req.params.id);
+      if (!existing) return res.status(404).json({ message: "Order not found" });
+      return res.status(409).json({ message: "Order is already cancelled" });
+    }
+    await restockOrderItems(order);
+    await order.populate("user", "name email");
+    return res.json(order);
+  }
   const order = await Order.findById(req.params.id);
   if (!order) return res.status(404).json({ message: "Order not found" });
   if (order.status === "cancelled" && req.body.status !== "cancelled") return res.status(409).json({ message: "Cancelled orders cannot be reopened" });
-  if (order.status !== "cancelled" && req.body.status === "cancelled") {
-    order.status = "cancelled";
-    await order.save();
-    await restockOrderItems(order);
-  } else if (order.status !== req.body.status) {
+  if (order.status !== req.body.status) {
     order.status = req.body.status;
     await order.save();
   }
