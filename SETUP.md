@@ -64,4 +64,7 @@ The storefront runs on `http://localhost:5173` and the API health endpoint is
 
 The repository includes `render.yaml`. Create a Render web service from the
 GitHub repository and add the secret environment variables in Render before
-deploying. Run `npm run seed:products` once against the production database.
+deploying. The blueprint keeps client-side payments disabled by default; only
+set `VITE_ENABLE_PAYMENTS=true` after configuring test payment credentials and
+reviewing the payment flow. Run `npm run seed:products` once against the
+production database.
