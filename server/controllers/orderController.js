@@ -49,6 +49,7 @@ export async function createOrder(req, res) {
       throw error;
     }
   } else {
+    if (process.env.MONGO_URI) return res.status(503).json({ message: "Order service is temporarily unavailable" });
     normalizedItems = items.map((item) => ({ product: item.product, name: item.name, quantity: Math.max(1, Number(item.quantity) || 1), price: Math.max(0, Number(item.price) || 0) }));
   }
   const total = normalizedItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
