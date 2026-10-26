@@ -11,6 +11,7 @@
 - AI shopping assistant with demo fallback
 - Admin product creation, editing, and deletion routes/screens
 - Admin order dashboard with search, status filtering, and status updates
+- Admin order detail inspection with customer, shipping, and line-item information
 - Customer order details, cancellation, and inventory restocking
 - Stock-aware carts, checkout reservations, and authoritative server pricing
 - Razorpay payment preparation layer with mock-payment development mode

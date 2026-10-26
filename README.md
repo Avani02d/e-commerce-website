@@ -75,6 +75,7 @@ Then set `MONGO_URI=mongodb://127.0.0.1:27017/ai-ecommerce` in `server/.env` and
 - `GET /api/orders/:id` — view one order
 - `PATCH /api/orders/:id/cancel` — cancel a pending or paid order
 - `GET /api/orders/admin` — list all orders (admin)
+- `GET /api/orders/admin/:id` — inspect one order with customer and shipping details (admin)
 - `PATCH /api/orders/admin/:id/status` — update an order status (admin)
 - `POST /api/payments/create-order` — prepare a mock or Razorpay payment
 - `POST /api/payments/verify` — verify a mock or Razorpay payment signature
