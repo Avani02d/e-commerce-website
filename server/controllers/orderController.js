@@ -93,6 +93,12 @@ export async function listAllOrders(_req, res) {
   res.json(orders);
 }
 
+export async function getAdminOrder(req, res) {
+  const order = await Order.findById(req.params.id).populate("user", "name email");
+  if (!order) return res.status(404).json({ message: "Order not found" });
+  res.json(order);
+}
+
 export async function updateOrderStatus(req, res) {
   const allowedStatuses = ["pending", "paid", "shipped", "delivered", "cancelled"];
   if (!allowedStatuses.includes(req.body?.status)) return res.status(400).json({ message: "Invalid order status" });

@@ -26,6 +26,7 @@ export const orderApi = {
   get: (token, id) => request(`/orders/${id}`, { headers: { Authorization: `Bearer ${token}` } }),
   cancel: (token, id) => request(`/orders/${id}/cancel`, { method: "PATCH", headers: { Authorization: `Bearer ${token}` } }),
   adminList: (token) => request("/orders/admin", { headers: { Authorization: `Bearer ${token}` } }),
+  adminGet: (token, id) => request(`/orders/admin/${id}`, { headers: { Authorization: `Bearer ${token}` } }),
   updateStatus: (token, id, status) => request(`/orders/admin/${id}/status`, { method: "PATCH", headers: { Authorization: `Bearer ${token}` }, body: JSON.stringify({ status }) })
 };
 export const paymentApi = {
