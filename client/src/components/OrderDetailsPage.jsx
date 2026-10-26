@@ -21,6 +21,7 @@ export default function OrderDetailsPage() {
   if (!order) return <main className="page empty"><p className="lede">Loading order…</p></main>;
 
   async function cancel() {
+    if (!window.confirm("Cancel this order? Items will be returned to inventory.")) return;
     setSaving(true);
     try { setOrder(await orderApi.cancel(session.token, order._id)); } catch (err) { setError(err.message); } finally { setSaving(false); }
   }

@@ -24,6 +24,7 @@ export default function AdminOrders() {
     try {
       const updated = await orderApi.updateStatus(session.token, id, status);
       setOrders((current) => current.map((order) => order._id === updated._id ? updated : order));
+      setSelectedOrder((current) => current?._id === updated._id ? updated : current);
     } catch (error) {
       setMessage(error.message);
     }
