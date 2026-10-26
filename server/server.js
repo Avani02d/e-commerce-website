@@ -22,7 +22,15 @@ const port = process.env.PORT || 5000;
 // Trusting the first proxy keeps rate limiting accurate without trusting
 // arbitrary client-supplied forwarding chains.
 app.set("trust proxy", 1);
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      "script-src": ["'self'", "https://checkout.razorpay.com"],
+      "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      "font-src": ["'self'", "https://fonts.gstatic.com"]
+    }
+  }
+}));
 app.use(cors({ origin: process.env.CLIENT_URL || "http://localhost:5173" }));
 app.use(express.json({ limit: "1mb" }));
 app.use("/api", rateLimit({ windowMs: 15 * 60 * 1000, limit: 300, standardHeaders: "draft-8", legacyHeaders: false }));
