@@ -34,12 +34,17 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/payments", paymentRoutes);
 
-app.get("/api/health", (_req, res) => res.json({
-  ok: true,
-  service: "ecommerce-api",
-  uptime: Math.round(process.uptime()),
-  database: mongoose.connection.readyState === 1 ? "connected" : "not-configured"
-}));
+app.get("/api/health", (_req, res) => {
+  const databaseConnected = mongoose.connection.readyState === 1;
+  const databaseConfigured = Boolean(process.env.MONGO_URI);
+  const healthy = !databaseConfigured || databaseConnected;
+  res.status(healthy ? 200 : 503).json({
+    ok: healthy,
+    service: "ecommerce-api",
+    uptime: Math.round(process.uptime()),
+    database: databaseConnected ? "connected" : databaseConfigured ? "unavailable" : "not-configured"
+  });
+});
 
 if (process.env.NODE_ENV === "production") {
   const rootDir = path.dirname(fileURLToPath(import.meta.url));
