@@ -9,10 +9,13 @@
 - JWT authentication and session revalidation
 - Checkout and order history
 - AI shopping assistant with demo fallback
-- Admin product creation and deletion routes/screens
-- Razorpay payment preparation layer
-- Docker and GitHub Actions configuration
-- API rate limiting, security headers, health checks, and error handling
+- Admin product creation, editing, and deletion routes/screens
+- Admin order dashboard with search, status filtering, and status updates
+- Customer order details, cancellation, and inventory restocking
+- Stock-aware carts, checkout reservations, and authoritative server pricing
+- Razorpay payment preparation layer with mock-payment development mode
+- Docker, Render, and GitHub Actions configuration
+- Production frontend serving, API smoke tests, dependency audits, and error handling
 
 ## Configuration still required
 
@@ -20,7 +23,10 @@
 2. Configure `MONGO_URI` and run `npm run seed:products` from `server/`.
 3. Add `OPENAI_API_KEY` for live AI responses.
 4. Add Razorpay test keys before enabling live checkout payments.
+5. Promote an account to admin before using the admin screens.
 
 ## Verification
 
-Run `npm run check` from the project root.
+Run `npm run check` from the project root. GitHub Actions runs the same build,
+server syntax check, production API smoke test, and dependency audits on every
+push and pull request.
