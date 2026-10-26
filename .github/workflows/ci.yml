@@ -27,7 +27,9 @@ jobs:
           api_pid=$!
           trap 'kill $api_pid' EXIT
           for attempt in {1..20}; do
-            if curl --fail --silent http://127.0.0.1:5000/api/health; then
+            if health=$(curl --fail --silent http://127.0.0.1:5000/api/health); then
+              echo "$health" | grep -q '"ok":true'
+              echo "$health" | grep -q '"database":"not-configured"'
               curl --fail --silent http://127.0.0.1:5000/ | grep -q 'id="root"'
               exit $?
             fi
