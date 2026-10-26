@@ -18,6 +18,10 @@ import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 const app = express();
 const port = process.env.PORT || 5000;
 
+// Render and other reverse proxies forward the original client address.
+// Trusting the first proxy keeps rate limiting accurate without trusting
+// arbitrary client-supplied forwarding chains.
+app.set("trust proxy", 1);
 app.use(helmet());
 app.use(cors({ origin: process.env.CLIENT_URL || "http://localhost:5173" }));
 app.use(express.json({ limit: "1mb" }));
